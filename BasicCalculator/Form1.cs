@@ -254,9 +254,9 @@ namespace BasicCalculator
         /// </summary>      
         private void CalculateEquation()
         {
-            this.CalculationResultTest.Text = ParseOperation();
-
-
+            //this.CalculationResultTest.Text = ParseOperation();
+            this.CalculationResultTest.Text = ParenthesisCheck();
+            
             // Focus the user input text 
             FocusInputText();
         }
@@ -283,10 +283,6 @@ namespace BasicCalculator
                 // starting from the left working to the right
                 for (int i = 0; i < input.Length; i++)
                 {
-                    // TODO: Handle order priority
-                    //      4 + 5 * 3
-                    //      it should calculate 5*3 first, then 4 + the result (4 + 15)
-
                     // check if the current character is a number
                     if ("0123456789.".Any(c => input[i] == c))
                     {
@@ -312,7 +308,7 @@ namespace BasicCalculator
                                 if (operatorType != OperationType.Minus)
                                     throw new InvalidOperationException($"Operator (+ / * or more than one -) specified wihtout a right side number");
 
-                                // If we got here, the operator type is a minus, and rhere is no right number currently, so add the minus to the number
+                                // If we got here, the operator type is a minus, and there is no right number currently, so add the minus to the number
                                 operation.RightSide += input[i];
                             }
                             else
@@ -339,7 +335,7 @@ namespace BasicCalculator
                                 if (operatorType != OperationType.Minus)
                                     throw new InvalidOperationException($"Operator (+ / * or more than one -) specified wihtout a left side number");
 
-                                // If we got here, the operator type is a minus, and rhere is no left number currently, so add the minus to the number
+                                // If we got here, the operator type is a minus, and there is no left number currently, so add the minus to the LeftSide
                                 operation.LeftSide += input[i];
                             }
                             else
@@ -362,7 +358,7 @@ namespace BasicCalculator
                 return CalculateOperation(operation);
 
 
-                return string.Empty;
+                //return string.Empty;
             }
             catch(Exception ex)
             {
@@ -452,6 +448,166 @@ namespace BasicCalculator
             }
         }
 
+        private string ParenthesisCheck()
+        {
+            // get the users equation input
+            var input = this.UserInputText.Text;
+
+            // remove all spaces
+            input = input.Replace(" ", "");
+
+            // substring containing the parenthesis equation from '(' to ')' inclusive
+            var inputSubstring = string.Empty;
+
+            // the length of the substring, calculated with the indexes of the '(' and ')'
+            var subLength = 0;
+
+            // creating a new opeartion to do the operation that's within the parenthesis
+            var operation = new Operation();
+            var parenthesisOperation = new ParenthesisOperation();
+
+            // used to flip between the left and right hand sides of the equation
+            var leftSide = true;
+
+            // looping through the equation string
+            for (int i = 0; i < input.Length; i++)
+            {
+                // checking for an opening parenthesis
+                if (input[i] == '(') 
+                {
+                    // checking if the previous character was an operator. Then inserting a multiplication sign before the parenthesis. 
+                    if (i != 0 && !"+-*/".Any(c => input[i - 1] == c))
+                    {
+                        // if it was not an operator, add a multiplication symbol and add one to i. 
+                        input = input.Insert(i, "*");
+
+                        // saving the open parenthesis index and moving through the string.
+                        parenthesisOperation.OpenParenthesis = true;
+                        i++;
+                        parenthesisOperation.OpenParenthesisIndex = i;
+                        continue;
+                    }
+                    else
+                    {
+                        // if the parenthesis is the 0th index or if the character before it was an operator
+                        // save the open parenthesis index and move on.
+                        parenthesisOperation.OpenParenthesis = true;
+                        parenthesisOperation.OpenParenthesisIndex = i;
+                        continue;
+                    }
+                }
+                // if we are currently inside a parenthesis, we're going to use an Operation() to save and calculate the sum. 
+                if (parenthesisOperation.OpenParenthesis == true)
+                {
+                    // checking if the current character is a closing parenthesis
+                    if (input[i] == ')')
+                    {
+                        // saving the closing parenthesis index.
+                        parenthesisOperation.CloseParenthesis = true;
+                        parenthesisOperation.CloseParenthesisIndex = i;
+                    }
+                    // check if the current character is a number
+                    else if ("0123456789.".Any(c => input[i] == c))
+                    {
+                        // Adding the number or decimal to the correct side of the equation.
+                        if (leftSide)
+                            operation.LeftSide = AddNumberPart(operation.LeftSide, input[i]);
+                        else
+                            operation.RightSide = AddNumberPart(operation.RightSide, input[i]);
+                    }
+                    // if it is an operator (+-*/) set the opeartor type
+                    else if ("+-*/".Any(c => input[i] == c))
+                    {
+                        // if we are on the right side already, we now need to calculate our current operation
+                        // and set the result to the left side of the next operation
+                        if (!leftSide)
+                        {
+                            // get the operator type
+                            var operatorType = GetOperationType(input[i]);
+
+                            // check if we actually have a right side number
+                            if (operation.RightSide.Length == 0)
+                            {
+                                // check the operator is not a minus
+                                if (operatorType != OperationType.Minus)
+                                    throw new InvalidOperationException($"Operator (+ / * or more than one -) specified wihtout a right side number");
+
+                                // If we got here, the operator type is a minus, and there is no right number currently, so add the minus to the number
+                                operation.RightSide += input[i];
+                            }
+                            else
+                            {
+                                // calculate previous equation
+                                operation.LeftSide = CalculateOperation(operation);
+
+                                //set new operator
+                                operation.OperationType = operatorType;
+
+                                // clear the previous right number
+                                operation.RightSide = string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            // get the operator type
+                            var operatorType = GetOperationType(input[i]);
+
+                            // check if we actually have a left side number
+                            if (operation.LeftSide.Length == 0)
+                            {
+                                // check the operator is not a minus
+                                if (operatorType != OperationType.Minus)
+                                    throw new InvalidOperationException($"Operator (+ / * or more than one -) specified wihtout a left side number");
+
+                                // If we got here, the operator type is a minus, and there is no left number currently, so add the minus to the LeftSide
+                                operation.LeftSide += input[i];
+                            }
+                            else
+                            {
+                                // if we get here, we have a left number, and an operator, so we want to move to the right side
+
+                                //set the operation type
+                                operation.OperationType = operatorType;
+
+                                // move to the right side
+                                leftSide = false;
+
+                            }
+                        }
+                    }
+                }
+                // if both parenthesis have been found, go through statement
+                if(parenthesisOperation.OpenParenthesis == true && parenthesisOperation.CloseParenthesis == true)
+                {
+                    // resetting the index
+                    i = 0;
+                    
+                    //resetting the side switch
+                    leftSide = true;
+
+                    // changing both booleans to false, for future parenthesis equations
+                    parenthesisOperation.OpenParenthesis = false;
+                    parenthesisOperation.CloseParenthesis = false;
+
+                    // calculating and saving the answer to the parenthesis equation
+                    parenthesisOperation.ParenthesisAnswer = CalculateOperation(operation);
+
+                    // calculating the length of the parenthesis equation. from '(' to ')' inclusive.
+                    subLength = (parenthesisOperation.CloseParenthesisIndex + 1) - parenthesisOperation.OpenParenthesisIndex;
+
+                    // defining the parenthesis equation
+                    inputSubstring = input.Substring(parenthesisOperation.OpenParenthesisIndex, subLength);
+
+                    // changing the entire equation by replacing the parenthesis equation with its result.
+                    input = input.Replace(inputSubstring, parenthesisOperation.ParenthesisAnswer);
+
+                    operation = new Operation();
+
+                }
+            }
+            return input;
+        }
+
         #region Clearing Methods
 
         /// <summary>
@@ -530,3 +686,8 @@ namespace BasicCalculator
         #endregion
     }
 }
+
+//Equation: -5+3(2*2) => -5+3*4
+// Operation() LinkedList: -5+3, 3*4 
+
+

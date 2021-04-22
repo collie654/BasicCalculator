@@ -27,11 +27,6 @@ namespace BasicCalculator
         /// </summary>
         public OperationType OperationType { get; set; }
 
-        /// <summary>
-        /// the inner operation to be performed initially before this opeation
-        /// </summary>
-        public Operation InnerOperation { get; set; }
-
         #endregion
 
         #region Constructor
