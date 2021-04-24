@@ -49,6 +49,7 @@
             this.DivideButton = new System.Windows.Forms.Button();
             this.DeleteButton = new System.Windows.Forms.Button();
             this.CEButton = new System.Windows.Forms.Button();
+            this.ParenthesisButton = new System.Windows.Forms.Button();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,6 +82,7 @@
             this.ButtonsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ButtonsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ButtonsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ButtonsPanel.Controls.Add(this.ParenthesisButton, 1, 0);
             this.ButtonsPanel.Controls.Add(this.EqualsButton, 3, 4);
             this.ButtonsPanel.Controls.Add(this.DecimalButton, 2, 4);
             this.ButtonsPanel.Controls.Add(this.ZeroButton, 1, 4);
@@ -309,6 +311,18 @@
             this.CEButton.UseVisualStyleBackColor = true;
             this.CEButton.Click += new System.EventHandler(this.CEButton_Click);
             // 
+            // ParenthesisButton
+            // 
+            this.ParenthesisButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.ParenthesisButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ParenthesisButton.Location = new System.Drawing.Point(117, 3);
+            this.ParenthesisButton.Name = "ParenthesisButton";
+            this.ParenthesisButton.Size = new System.Drawing.Size(108, 67);
+            this.ParenthesisButton.TabIndex = 20;
+            this.ParenthesisButton.Text = "( )";
+            this.ParenthesisButton.UseVisualStyleBackColor = true;
+            this.ParenthesisButton.Click += new System.EventHandler(this.ParenthesisButton_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.EqualsButton;
@@ -351,6 +365,7 @@
         private System.Windows.Forms.Button DivideButton;
         private System.Windows.Forms.Button DeleteButton;
         private System.Windows.Forms.Button CEButton;
+        private System.Windows.Forms.Button ParenthesisButton;
     }
 }
 
