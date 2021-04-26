@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace BasicCalculator
@@ -17,6 +18,7 @@ namespace BasicCalculator
         public Form1()
         {
             InitializeComponent();
+            
         }
         #endregion
 
@@ -87,7 +89,6 @@ namespace BasicCalculator
         {
             // starts the process of calculating the equation
             CalculateEquation();
-
             // Focus the user input text 
             FocusInputText();
         }
@@ -256,7 +257,7 @@ namespace BasicCalculator
 
             // count the number of open and closed paranthesis in the input
             int parenCount = input.Count(f => (f == ')')) + input.Count(f => (f == '('));
-            
+
 
             // if the number of open parenthesis is 0 or even, add an open parenthesis
             if (parenCount % 2 == 0)
@@ -278,13 +279,10 @@ namespace BasicCalculator
         /// <returns></returns>     
         private void CalculateEquation()
         {
-            // get the users equation input
-            var input = this.UserInputText.Text;
+            // gathers the input and makes sure it's as clean as possible before attempting to solve it
+            var input = InputManipulation();
 
-            // remove all spaces
-            input = input.Replace(" ", "");
-
-            // displays the answer to the user
+            // attempts to solve the equation and displays the answer to the user
             this.CalculationResultTest.Text = OperatorLooper(ParenthesisLooper(input));
 
             // Focus the user input text 
@@ -356,7 +354,7 @@ namespace BasicCalculator
 
             // remember selection start
             var selectionStart = this.UserInputText.SelectionStart;
-            
+
             //Checks if the user input has text, if true deletes the character to the right of the cursor.
             this.UserInputText.Text = this.UserInputText.Text.Remove(this.UserInputText.SelectionStart, 1);
 
@@ -515,16 +513,16 @@ namespace BasicCalculator
                             // so all characters before this are numbers. 
                             prevOpCheck = true;
                             prevOpIndex = -1;
-                            
+
                             // we say that we've found the current operator
                             currentOpCheck = true;
                         }
                         // if we've already found the previous operator but not the current operator
-                        else if (prevOpCheck && !currentOpCheck)
+                        else if (!currentOpCheck)
                             // we say that we've found the current operator
                             currentOpCheck = true;
                         // if we've found the previous and current operator but not the next operator
-                        else if (prevOpCheck && currentOpCheck && !nextOpCheck)
+                        else if (!nextOpCheck)
                         {
                             // we say we've found the next operator and mark its index
                             nextOpCheck = true;
@@ -542,21 +540,22 @@ namespace BasicCalculator
                             prevOpCheck = true;
                             prevOpIndex = i;
                         }
-                        // if we've found the previous and current operation but not the next
-                        else if (prevOpCheck && currentOpCheck && !nextOpCheck)
-                        {
-                            // say we've found the operation and save the index
-                            nextOpCheck = true;
-                            nextOpIndex = i;
-                        }
                         // if we've found another + or - after the previous operator and we still havent found
                         // out current operator, replace the previous operator with this one
-                        else if (prevOpCheck && !currentOpCheck && !nextOpCheck)
+                        else if (!currentOpCheck && !nextOpCheck)
                         {
                             // say we've found the operation and save its index
                             prevOpCheck = true;
                             prevOpIndex = i;
                         }
+                        // if we've found the previous and current operation but not the next
+                        else if (!nextOpCheck)
+                        {
+                            // say we've found the operation and save the index
+                            nextOpCheck = true;
+                            nextOpIndex = i;
+                        }
+
                     }
                     // if we're at the end of the equation and we still havent found the next operator
                     if (i + 1 == input.Length && !nextOpCheck)
@@ -579,12 +578,11 @@ namespace BasicCalculator
 
                         // replacing the equation with its sum in the input
                         input = input.Remove(prevOpIndex + 1, equationLength).Insert(prevOpIndex + 1, sum);
-              
+
                         // if the input still contains a * or / operator
                         if (input.Contains('*') || input.Contains('/'))
                         {
                             // reset the necessary variables and continue through the loop
-                            prevOpCheck = false;
                             nextOpCheck = false;
                             currentOpCheck = false;
 
@@ -606,7 +604,7 @@ namespace BasicCalculator
 
                 prevOpIndex = 0;
                 nextOpIndex = 0;
-                
+
                 // looping through the input
                 for (int i = 0; i < input.Length; i++)
                 {
@@ -614,11 +612,11 @@ namespace BasicCalculator
                     if ("+-".Any(c => input[i] == c))
                     {
                         //means the first number is a negative, first character is a -
-                        if(i == 0)
+                        if (i == 0)
                         {
                             // set the previous operator index to -1 essentially.
                             prevOpIndex -= 1;
-                        }
+                        }  
                         // means it's not the first character, and there is no current operator
                         else if (!currentOpCheck)
                         {
@@ -629,11 +627,11 @@ namespace BasicCalculator
                         {
                             // mark is as true and save the index
                             nextOpCheck = true;
-                            nextOpIndex = i;    
-                        }                     
+                            nextOpIndex = i;
+                        }
                     }
                     // if we've reached the end of the input
-                    if (i + 1 == input.Length )
+                    if (i + 1 == input.Length)
                     {
                         // if there's no current operator, that means there is only one number in the input, the solution
                         if (!currentOpCheck)
@@ -646,7 +644,7 @@ namespace BasicCalculator
                             nextOpIndex = i + 1;
                         }
                     }
-                    
+
                     // if we've found the current and next operators proceed to solve the equation
                     if (currentOpCheck && nextOpCheck)
                     {
@@ -676,7 +674,7 @@ namespace BasicCalculator
                         // if not, break out of the loop
                         else
                             break;
-                    }                 
+                    }
                 }
             }
             return input;
@@ -806,6 +804,134 @@ namespace BasicCalculator
             {
                 throw new InvalidOperationException($"failed to calculated operation {operation.LeftSide} {operation.OperationType} {operation.RightSide}. {ex.Message}");
             }
+        }
+        #endregion
+
+        #region Input Validation/Error Handling
+        /// <summary>
+        /// Attempts to validate the input by retrieving it from <see cref="InputManipulation"/> and passing it through <see cref="ValidInput(string, out string)"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UserInputText_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // error message that's defined and presented to the user when an error occurs.
+            string errorMsg;
+
+            // if the function ValidInput returns false, it returns the error message provided
+            if (!ValidInput(InputManipulation(), out errorMsg))
+            {
+                // Cancel the event and select the text to be corrected by the user.
+                e.Cancel = true;
+                UserInputText.Select(0, UserInputText.Text.Length);
+
+                // Set the ErrorProvider error with the text to display. 
+                this.equationErrorProvider.SetError(UserInputText, errorMsg);
+            }
+        }
+
+        /// <summary>
+        /// Clears the ErrorProvider <see cref="equationErrorProvider"/> of errors if the input is valid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UserInputText_Validated(object sender, EventArgs e)
+        {
+            // If all conditions have been met, clear the ErrorProvider of errors.
+            equationErrorProvider.SetError(UserInputText, "");
+        }
+
+        /// <summary>
+        /// Attempts to validate the input.
+        /// </summary>
+        /// <param name="input">The equation being validated from the <see cref="UserInputText"/> text box</param>
+        /// <param name="errorMessage"> the error message to be passed if the input is invalid</param>
+        /// <returns></returns>
+        public bool ValidInput(string input, out string errorMessage)
+        {
+            // if the string is empty
+            if (input == string.Empty)
+            {
+                // the ErrorProvider should return this message:
+                errorMessage = "You have not entered an equation, please enter one and try again.";
+                return false;
+            }
+            // if the equation contains characters that are not allowed
+            else if (!Regex.IsMatch(input, @"^[\d\.\+\-\*\/\(\)]+$"))
+            {
+                // the ErrorProvider should return this message:
+                errorMessage = "The equation contains invalid characters, please remove then and try again. Characters allowed: [0-9] + - * / ( )";
+                return false;
+            }
+            // if there's only one character, and it's not a number, or if there's 2 characters and the 2nd one is not a number, throw this error.
+            else if (input.Length == 1 && !"0123456789".Any(c => input[0] == c) || input.Length == 2 && !"0123456789".Any(c => input[1] == c))
+            {
+                // the ErrorProvider should return this message:
+                errorMessage = "The equation you've entered is not a number, please try again.";
+                return false;
+            }
+            // if the equation starts with anything but [0-9], -, ., ( OR ends with anything but [0-9], )
+            else if (input.StartsWith("+") || input.StartsWith("*") || input.StartsWith("/") || input.StartsWith(")") ||
+                input.EndsWith("+") || input.EndsWith("-") || input.EndsWith("*") || input.EndsWith("/") || input.EndsWith(".") || input.EndsWith("("))
+            {
+                // the ErrorProvider should return this message:
+                errorMessage = "The equation begins or ends with an invalid character, please try again.";
+                return false;
+            }
+            // if the operator is surronded by unacceptable characters OR there are two operators in a row
+            else if (!Regex.IsMatch(input, @"(?:[0-9]|\))(?:\+|\-|\*|\/)(?:[0-9]|\(|\.|\-)"))
+            {
+                // the ErrorProvider should return this message:
+                errorMessage = "The equation contains two or more characters together that are not allowed, please review your equation and try again.";
+                return false;
+            }      
+            /*
+             * At this point we know:
+             *                          - The string is not empty
+             *                          - contains only applicable characters
+             *                          - if it's only 1 or 2 characters long, it's correct
+             *                          - it starts and ends with valid characters
+             *                          - if the operator is surronded by unacceptable characters. Acceptable Sequences: [0-9], )   OPERATOR    [0-9], ., -
+             */
+            // the equation has been validated to the a certain extent
+            else
+            {
+                // there is no message
+                errorMessage = "";
+                return true;
+            }
+            
+        }
+
+        /// <summary>
+        /// Allows the user to close the form even if there's an error, or if they haven't submitted anything.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = false;
+        }
+
+        /// <summary>
+        /// Manipulates the input from <see cref="UserInputText"/> 
+        /// to remove any whitespace or double negatives.
+        /// </summary>
+        /// <returns></returns>
+        private string InputManipulation()
+        {
+            // gets the input from the UserInputText text box
+            var input = UserInputText.Text;
+
+            // replaces white space with nothing
+            input = input.Replace(" ", "");
+
+            // replaces double negatives with addition signs
+            input = input.Replace("--", "+");
+
+            // returns the input
+            return input;
+
         }
         #endregion
     }

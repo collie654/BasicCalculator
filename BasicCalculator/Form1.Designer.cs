@@ -28,9 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.UserInputText = new System.Windows.Forms.TextBox();
             this.CalculationResultTest = new System.Windows.Forms.Label();
             this.ButtonsPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.ParenthesisButton = new System.Windows.Forms.Button();
             this.EqualsButton = new System.Windows.Forms.Button();
             this.DecimalButton = new System.Windows.Forms.Button();
             this.ZeroButton = new System.Windows.Forms.Button();
@@ -49,8 +51,9 @@
             this.DivideButton = new System.Windows.Forms.Button();
             this.DeleteButton = new System.Windows.Forms.Button();
             this.CEButton = new System.Windows.Forms.Button();
-            this.ParenthesisButton = new System.Windows.Forms.Button();
+            this.equationErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this.ButtonsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.equationErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // UserInputText
@@ -59,13 +62,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.UserInputText.Location = new System.Drawing.Point(12, 12);
             this.UserInputText.Name = "UserInputText";
-            this.UserInputText.Size = new System.Drawing.Size(460, 20);
+            this.UserInputText.Size = new System.Drawing.Size(433, 20);
             this.UserInputText.TabIndex = 0;
+            this.UserInputText.Validating += new System.ComponentModel.CancelEventHandler(this.UserInputText_Validating);
+            this.UserInputText.Validated += new System.EventHandler(this.UserInputText_Validated);
             // 
             // CalculationResultTest
             // 
             this.CalculationResultTest.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.CalculationResultTest.CausesValidation = false;
             this.CalculationResultTest.Location = new System.Drawing.Point(13, 43);
             this.CalculationResultTest.Name = "CalculationResultTest";
             this.CalculationResultTest.Size = new System.Drawing.Size(459, 55);
@@ -77,6 +83,7 @@
             this.ButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonsPanel.CausesValidation = false;
             this.ButtonsPanel.ColumnCount = 4;
             this.ButtonsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ButtonsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
@@ -112,6 +119,19 @@
             this.ButtonsPanel.Size = new System.Drawing.Size(456, 368);
             this.ButtonsPanel.TabIndex = 2;
             // 
+            // ParenthesisButton
+            // 
+            this.ParenthesisButton.CausesValidation = false;
+            this.ParenthesisButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.ParenthesisButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ParenthesisButton.Location = new System.Drawing.Point(117, 3);
+            this.ParenthesisButton.Name = "ParenthesisButton";
+            this.ParenthesisButton.Size = new System.Drawing.Size(108, 67);
+            this.ParenthesisButton.TabIndex = 20;
+            this.ParenthesisButton.Text = "( )";
+            this.ParenthesisButton.UseVisualStyleBackColor = true;
+            this.ParenthesisButton.Click += new System.EventHandler(this.ParenthesisButton_Click);
+            // 
             // EqualsButton
             // 
             this.EqualsButton.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -125,6 +145,7 @@
             // 
             // DecimalButton
             // 
+            this.DecimalButton.CausesValidation = false;
             this.DecimalButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DecimalButton.Location = new System.Drawing.Point(231, 295);
             this.DecimalButton.Name = "DecimalButton";
@@ -136,6 +157,7 @@
             // 
             // ZeroButton
             // 
+            this.ZeroButton.CausesValidation = false;
             this.ZeroButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ZeroButton.Location = new System.Drawing.Point(117, 295);
             this.ZeroButton.Name = "ZeroButton";
@@ -147,6 +169,7 @@
             // 
             // AdditionButton
             // 
+            this.AdditionButton.CausesValidation = false;
             this.AdditionButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AdditionButton.Location = new System.Drawing.Point(345, 222);
             this.AdditionButton.Name = "AdditionButton";
@@ -158,6 +181,7 @@
             // 
             // ThreeButton
             // 
+            this.ThreeButton.CausesValidation = false;
             this.ThreeButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ThreeButton.Location = new System.Drawing.Point(231, 222);
             this.ThreeButton.Name = "ThreeButton";
@@ -169,6 +193,7 @@
             // 
             // TwoButton
             // 
+            this.TwoButton.CausesValidation = false;
             this.TwoButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TwoButton.Location = new System.Drawing.Point(117, 222);
             this.TwoButton.Name = "TwoButton";
@@ -180,6 +205,7 @@
             // 
             // OneButton
             // 
+            this.OneButton.CausesValidation = false;
             this.OneButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.OneButton.Location = new System.Drawing.Point(3, 222);
             this.OneButton.Name = "OneButton";
@@ -191,6 +217,7 @@
             // 
             // SubtractionButton
             // 
+            this.SubtractionButton.CausesValidation = false;
             this.SubtractionButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SubtractionButton.Location = new System.Drawing.Point(345, 149);
             this.SubtractionButton.Name = "SubtractionButton";
@@ -202,6 +229,7 @@
             // 
             // SixButton
             // 
+            this.SixButton.CausesValidation = false;
             this.SixButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SixButton.Location = new System.Drawing.Point(231, 149);
             this.SixButton.Name = "SixButton";
@@ -213,6 +241,7 @@
             // 
             // FiveButton
             // 
+            this.FiveButton.CausesValidation = false;
             this.FiveButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FiveButton.Location = new System.Drawing.Point(117, 149);
             this.FiveButton.Name = "FiveButton";
@@ -224,6 +253,7 @@
             // 
             // FourButton
             // 
+            this.FourButton.CausesValidation = false;
             this.FourButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FourButton.Location = new System.Drawing.Point(3, 149);
             this.FourButton.Name = "FourButton";
@@ -235,6 +265,7 @@
             // 
             // MultiplyButton
             // 
+            this.MultiplyButton.CausesValidation = false;
             this.MultiplyButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MultiplyButton.Location = new System.Drawing.Point(345, 76);
             this.MultiplyButton.Name = "MultiplyButton";
@@ -246,6 +277,7 @@
             // 
             // NineButton
             // 
+            this.NineButton.CausesValidation = false;
             this.NineButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.NineButton.Location = new System.Drawing.Point(231, 76);
             this.NineButton.Name = "NineButton";
@@ -257,6 +289,7 @@
             // 
             // EightButton
             // 
+            this.EightButton.CausesValidation = false;
             this.EightButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.EightButton.Location = new System.Drawing.Point(117, 76);
             this.EightButton.Name = "EightButton";
@@ -268,6 +301,7 @@
             // 
             // SevenButton
             // 
+            this.SevenButton.CausesValidation = false;
             this.SevenButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SevenButton.Location = new System.Drawing.Point(3, 76);
             this.SevenButton.Name = "SevenButton";
@@ -279,6 +313,7 @@
             // 
             // DivideButton
             // 
+            this.DivideButton.CausesValidation = false;
             this.DivideButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DivideButton.Location = new System.Drawing.Point(345, 3);
             this.DivideButton.Name = "DivideButton";
@@ -290,6 +325,7 @@
             // 
             // DeleteButton
             // 
+            this.DeleteButton.CausesValidation = false;
             this.DeleteButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DeleteButton.Location = new System.Drawing.Point(231, 3);
             this.DeleteButton.Name = "DeleteButton";
@@ -301,6 +337,7 @@
             // 
             // CEButton
             // 
+            this.CEButton.CausesValidation = false;
             this.CEButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.CEButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CEButton.Location = new System.Drawing.Point(3, 3);
@@ -311,24 +348,18 @@
             this.CEButton.UseVisualStyleBackColor = true;
             this.CEButton.Click += new System.EventHandler(this.CEButton_Click);
             // 
-            // ParenthesisButton
+            // equationErrorProvider
             // 
-            this.ParenthesisButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ParenthesisButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ParenthesisButton.Location = new System.Drawing.Point(117, 3);
-            this.ParenthesisButton.Name = "ParenthesisButton";
-            this.ParenthesisButton.Size = new System.Drawing.Size(108, 67);
-            this.ParenthesisButton.TabIndex = 20;
-            this.ParenthesisButton.Text = "( )";
-            this.ParenthesisButton.UseVisualStyleBackColor = true;
-            this.ParenthesisButton.Click += new System.EventHandler(this.ParenthesisButton_Click);
+            this.equationErrorProvider.ContainerControl = this;
             // 
             // Form1
             // 
             this.AcceptButton = this.EqualsButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
             this.CancelButton = this.CEButton;
+            this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(484, 481);
             this.Controls.Add(this.ButtonsPanel);
             this.Controls.Add(this.CalculationResultTest);
@@ -336,7 +367,9 @@
             this.MinimumSize = new System.Drawing.Size(500, 520);
             this.Name = "Form1";
             this.Text = "Basic Calculator";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ButtonsPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.equationErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -366,6 +399,7 @@
         private System.Windows.Forms.Button DeleteButton;
         private System.Windows.Forms.Button CEButton;
         private System.Windows.Forms.Button ParenthesisButton;
+        private System.Windows.Forms.ErrorProvider equationErrorProvider;
     }
 }
 
