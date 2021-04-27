@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.UserInputText = new System.Windows.Forms.TextBox();
             this.CalculationResultTest = new System.Windows.Forms.Label();
             this.ButtonsPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -364,6 +365,7 @@
             this.Controls.Add(this.ButtonsPanel);
             this.Controls.Add(this.CalculationResultTest);
             this.Controls.Add(this.UserInputText);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(500, 520);
             this.Name = "Form1";
             this.Text = "Basic Calculator";

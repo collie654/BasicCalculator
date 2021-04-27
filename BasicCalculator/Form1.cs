@@ -17,8 +17,7 @@ namespace BasicCalculator
         /// </summary>
         public Form1()
         {
-            InitializeComponent();
-            
+            InitializeComponent();       
         }
         #endregion
 
@@ -250,14 +249,19 @@ namespace BasicCalculator
             FocusInputText();
         }
 
+        /// <summary>
+        /// Adds parenthesis to the equation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ParenthesisButton_Click(object sender, EventArgs e)
         {
+            
             // get the users equation input
             var input = this.UserInputText.Text;
 
             // count the number of open and closed paranthesis in the input
             int parenCount = input.Count(f => (f == ')')) + input.Count(f => (f == '('));
-
 
             // if the number of open parenthesis is 0 or even, add an open parenthesis
             if (parenCount % 2 == 0)
@@ -611,25 +615,24 @@ namespace BasicCalculator
                     // if there are any + or - operators in the input 
                     if ("+-".Any(c => input[i] == c))
                     {
-                        //means the first number is a negative, first character is a -
-                        if (i == 0)
+                        //means the first number is not a negative
+                        if (i != 0)
                         {
-                            // set the previous operator index to -1 essentially.
-                            prevOpIndex -= 1;
-                        }  
-                        // means it's not the first character, and there is no current operator
-                        else if (!currentOpCheck)
-                        {
-                            currentOpCheck = true;
-                        }
-                        // means if we're not at the first character, and there is a currentOpCheck and there is no nextOpCheck
-                        else if (!nextOpCheck)
-                        {
+                            // means it's not the first character, and there is no current operator
+                            if (!currentOpCheck)
+                                {
+                                    currentOpCheck = true;
+                                }
+                            // means if we're not at the first character, and there is a currentOpCheck and there is no nextOpCheck
+                            else if (!nextOpCheck)
+                            {
                             // mark is as true and save the index
                             nextOpCheck = true;
                             nextOpIndex = i;
+                            }
                         }
-                    }
+                    }  
+
                     // if we've reached the end of the input
                     if (i + 1 == input.Length)
                     {
@@ -649,7 +652,10 @@ namespace BasicCalculator
                     if (currentOpCheck && nextOpCheck)
                     {
                         // the length of the substring
-                        var subLength = nextOpIndex - prevOpIndex;
+                        var subLength = nextOpIndex;
+
+                        if(prevOpIndex != 0)                       
+                            subLength = nextOpIndex - prevOpIndex;
 
                         // the substring of the equation that's going to be solved
                         var equationSub = input.Substring(0, subLength);
